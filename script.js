@@ -50,3 +50,37 @@ document.addEventListener('DOMContentLoaded', (event) => {
 
     updateDisplay();
 });
+
+function generateHeightmap(width, height) {
+    const canvas = document.createElement('canvas');
+    canvas.width = width;
+    canvas.height = height;
+    const ctx = canvas.getContext('2d');
+    const imageData = ctx.createImageData(width, height);
+    const data = imageData.data;
+
+    for (let y = 0; y < height; y++) {
+        for (let x = 0; x < width; x++) {
+            const index = (y * width + x) * 4;
+            const value = Math.random() * 255;
+            data[index] = value;      // Red
+            data[index + 1] = value;  // Green
+            data[index + 2] = value;  // Blue
+            data[index + 3] = 255;    // Alpha
+        }
+    }
+    ctx.putImageData(imageData, 0, 0);
+    return canvas;
+}
+
+
+const heightmapCanvas = document.getElementById('heightmap');
+const width = 256;
+const height = 256;
+
+const heightmap = generateHeightmap(width, height);
+heightmapCanvas.width = width;
+heightmapCanvas.height = height;
+const ctx = heightmapCanvas.getContext('2d');
+ctx.drawImage(heightmap, 0, 0);
+
