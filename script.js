@@ -126,3 +126,37 @@ function generateCountries(imageData, numCountries) {
 const numCountries = Math.random(2, 8); // Number of countries
 const countryData = generateCountries(classifiedData, numCountries);
 ctx.putImageData(countryData, 0, 0);
+
+
+function populateCountrySelector(numCountries) {
+    const selector = document.getElementById('country-selector');
+    for (let i = 1; i <= numCountries; i++) {
+        const option = document.createElement('option');
+        option.value = i;
+        option.textContent = `Country ${i}`;
+        selector.appendChild(option);
+    }
+}
+
+function highlightCountry(countryId) {
+    const imageData = ctx.getImageData(0, 0, width, height);
+    const data = imageData.data;
+
+    for (let i = 0; i < data.length; i += 4) {
+        if (data[i] / 20 === countryId) {
+            data[i] = 255; // Red
+            data[i + 1] = 0; // Green
+            data[i + 2] = 0; // Blue
+        } else {
+            data[i] = data[i + 1] = data[i + 2] = 0; // Hide other countries
+        }
+    }
+    ctx.putImageData(imageData, 0, 0);
+}
+
+document.getElementById('country-selector').addEventListener('change', (event) => {
+    highlightCountry(parseInt(event.target.value));
+});
+
+populateCountrySelector(numCountries);
+
