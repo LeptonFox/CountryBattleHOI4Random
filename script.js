@@ -84,3 +84,45 @@ heightmapCanvas.height = height;
 const ctx = heightmapCanvas.getContext('2d');
 ctx.drawImage(heightmap, 0, 0);
 
+function classifyLandWater(imageData) {
+    const threshold = 128; // Adjust threshold as needed
+    const data = imageData.data;
+
+    for (let i = 0; i < data.length; i += 4) {
+        const value = (data[i] + data[i + 1] + data[i + 2]) / 3;
+        const isLand = value > threshold;
+        data[i] = isLand ? 0 : 0; // Red
+        data[i + 1] = isLand ? 255 : 0; // Green
+        data[i + 2] = isLand ? 0 : 255; // Blue
+        data[i + 3] = 255; // Alpha
+    }
+    return imageData;
+}
+
+const imageData = ctx.getImageData(0, 0, width, height);
+const classifiedData = classifyLandWater(imageData);
+ctx.putImageData(classifiedData, 0, 0);
+
+function generateCountries(imageData, numCountries) {
+    const data = imageData.data;
+    const width = imageData.width;
+    const height = imageData.height;
+    const countries = new Array(numCountries).fill(0).map((_, i) => i + 1);
+
+    for (let y = 0; y < height; y++) {
+        for (let x = 0; x < width; x++) {
+            const index = (y * width + x) * 4;
+            if (data[index] === 0) { // Land
+                const country = countries[Math.floor(Math.random() * countries.length)];
+                data[index] = country * 20; // Assign random country ID
+                data[index + 1] = country * 20;
+                data[index + 2] = country * 20;
+            }
+        }
+    }
+    return imageData;
+}
+
+const numCountries = Math.random(2, 8); // Number of countries
+const countryData = generateCountries(classifiedData, numCountries);
+ctx.putImageData(countryData, 0, 0);
